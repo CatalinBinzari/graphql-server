@@ -1,15 +1,35 @@
 [
-  {
-      "bookId": 17,
-      "name": "Harry Potter",
-      "pages": 267,
-      "genre": "fantasy",
-      "author": {
-            "id": 1,
-            "name": "J.K. Rowling"
-      }
-  },
-  {
+    {
+        "bookId": 17,
+        "name": "Harry Potter",
+        "pages": 267,
+        "genre": "fantasy",
+        "author": {
+                    "id": 1,
+                    "name": "J.K. Rowling"
+        },
+        "reviews": [
+            {
+                "id": 1,
+                "review": "This is a good book",
+                "rating": 4,
+                "reviewer": {
+                    "id": 1,
+                    "name": "John"
+                }
+            },
+            {
+                "id": 2,
+                "review": "This is a bad book",
+                "rating": 2,
+                "reviewer": {
+                    "id": 2,
+                    "name": "Jane"
+                }
+            }
+        ]
+    },
+    {
       "bookId": 54,
       "name": "Memory Man",
       "pages": 560,
@@ -17,7 +37,27 @@
       "author": {
             "id": 2,
             "name": "J.K. Rowling."
-      }
+      },
+      "reviews": [
+        {
+            "id": 1,
+            "review": "This is a good book",
+            "rating": 4,
+            "reviewer": {
+                "id": 1,
+                "name": "John"
+            }
+        },
+        {
+            "id": 2,
+            "review": "This is a bad book",
+            "rating": 2,
+            "reviewer": {
+                "id": 2,
+                "name": "Jane"
+            }
+        }
+    ]
   },
   {
       "bookId": 66,
@@ -27,6 +67,26 @@
       "author": {
             "id": 3,
             "name": "Unknown"
-      }
+      },
+      "reviews": [
+        {
+            "id": 1,
+            "review": "This is a good book",
+            "rating": 4,
+            "reviewer": {
+                "id": 1,
+                "name": "John"
+            }
+        },
+        {
+            "id": 2,
+            "review": "This is a bad book",
+            "rating": 2,
+            "reviewer": {
+                "id": 2,
+                "name": "Jane"
+            }
+        }
+    ]
   }
 ]

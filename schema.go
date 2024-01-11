@@ -55,18 +55,58 @@ var authorType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var reviewerType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Reviewer",
+	Fields: graphql.Fields{
+		"id":   &graphql.Field{Type: graphql.Int},
+		"name": &graphql.Field{Type: graphql.String},
+	},
+})
+
+var listType = graphql.NewList(graphql.NewObject(graphql.ObjectConfig{
+	Name: "Review",
+	Fields: graphql.Fields{
+		"id": &graphql.Field{
+			Type: graphql.Int,
+		},
+		"review": &graphql.Field{
+			Type: graphql.String,
+		},
+		"rating": &graphql.Field{
+			Type: graphql.Int,
+		},
+		"reviewer": &graphql.Field{
+			Type: reviewerType,
+		},
+	},
+}))
+
 // json types
+
 type Author struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
+type Reviewer struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Review struct {
+	ID       int      `json:"id"`
+	Review   string   `json:"review"`
+	Rating   int      `json:"rating"`
+	Reviewer Reviewer `json:"reviewer"`
+}
+
 type Book struct {
-	ID     int    `json:"bookId"`
-	Name   string `json:"name"`
-	Pages  int    `json:"pages"`
-	Genre  string `json:"genre"`
-	Author Author `json:"author"`
+	ID     int      `json:"bookId"`
+	Name   string   `json:"name"`
+	Pages  int      `json:"pages"`
+	Genre  string   `json:"genre"`
+	Author Author   `json:"author"`
+	Review []Review `json:"reviews"`
 }
 
 // define custom GraphQL ObjectType `bookType` for our Golang struct `Book`
@@ -90,6 +130,9 @@ var bookType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"author": &graphql.Field{
 			Type: authorType,
+		},
+		"reviews": &graphql.Field{
+			Type: listType,
 		},
 	},
 })
