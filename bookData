@@ -2,16 +2,31 @@
   {
       "bookId": 17,
       "name": "Harry Potter",
-      "pages": 267
+      "pages": 267,
+      "genre": "fantasy",
+      "author": {
+            "id": 1,
+            "name": "J.K. Rowling"
+      }
   },
   {
       "bookId": 54,
       "name": "Memory Man",
-      "pages": 560
+      "pages": 560,
+      "genre": "horror",
+      "author": {
+            "id": 2,
+            "name": "J.K. Rowling."
+      }
   },
   {
       "bookId": 66,
       "name" : "Exhalation",
-      "pages" : 368
+      "pages" : 368,
+      "genre": "mystery",
+      "author": {
+            "id": 3,
+            "name": "Unknown"
+      }
   }
 ]

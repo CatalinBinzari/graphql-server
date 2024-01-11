@@ -27,10 +27,46 @@ func importJSONDataFromFile(fileName string, result interface{}) (isOK bool) {
 var BookList []Book
 var _ = importJSONDataFromFile("./bookData", &BookList)
 
+// graphQL types
+var bookGenreType = graphql.NewEnum(graphql.EnumConfig{
+	Name: "BookGenre",
+	Values: graphql.EnumValueConfigMap{
+		"HORROR": &graphql.EnumValueConfig{
+			Value: "horror",
+		},
+		"FANTASY": &graphql.EnumValueConfig{
+			Value: "fantasy",
+		},
+		"DRAMA": &graphql.EnumValueConfig{
+			Value: "drama",
+		},
+		"MYSTERY": &graphql.EnumValueConfig{
+			Value: "mystery",
+		},
+		// Add more genres as needed
+	},
+})
+
+var authorType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Author",
+	Fields: graphql.Fields{
+		"id":   &graphql.Field{Type: graphql.Int},
+		"name": &graphql.Field{Type: graphql.String},
+	},
+})
+
+// json types
+type Author struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type Book struct {
-	ID    int    `json:"bookId"`
-	Name  string `json:"name"`
-	Pages int    `json:"pages"`
+	ID     int    `json:"bookId"`
+	Name   string `json:"name"`
+	Pages  int    `json:"pages"`
+	Genre  string `json:"genre"`
+	Author Author `json:"author"`
 }
 
 // define custom GraphQL ObjectType `bookType` for our Golang struct `Book`
@@ -48,6 +84,12 @@ var bookType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"pages": &graphql.Field{
 			Type: graphql.Int,
+		},
+		"genre": &graphql.Field{
+			Type: bookGenreType,
+		},
+		"author": &graphql.Field{
+			Type: authorType,
 		},
 	},
 })
