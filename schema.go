@@ -24,38 +24,30 @@ func importJSONDataFromFile(fileName string, result interface{}) (isOK bool) {
 	return
 }
 
-var BeastList []Beast
-var _ = importJSONDataFromFile("./beastData", &BeastList)
+var BookList []Book
+var _ = importJSONDataFromFile("./bookData", &BookList)
 
-type Beast struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	OtherNames  []string `json:"otherNames"`
-	ImageURL    string   `json:"imageUrl"`
+type Book struct {
+	ID    int    `json:"bookId"`
+	Name  string `json:"name"`
+	Pages int    `json:"pages"`
 }
 
-// define custom GraphQL ObjectType `beastType` for our Golang struct `Beast`
+// define custom GraphQL ObjectType `bookType` for our Golang struct `Book`
 // Note that
 // - the fields in our todoType maps with the json tags for the fields in our struct
 // - the field type matches the field type in our struct
-var beastType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Beast",
+var bookType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Book",
 	Fields: graphql.Fields{
-		"name": &graphql.Field{
-			Type: graphql.String,
-		},
-		"description": &graphql.Field{
-			Type: graphql.String,
-		},
 		"id": &graphql.Field{
 			Type: graphql.Int,
 		},
-		"otherNames": &graphql.Field{
-			Type: graphql.NewList(graphql.String),
-		},
-		"imageUrl": &graphql.Field{
+		"name": &graphql.Field{
 			Type: graphql.String,
+		},
+		"pages": &graphql.Field{
+			Type: graphql.Int,
 		},
 	},
 })
@@ -66,99 +58,77 @@ var currentMaxId = 5
 var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootMutation",
 	Fields: graphql.Fields{
-		"addBeast": &graphql.Field{
-			Type:        beastType, // the return type for this field
-			Description: "add a new beast",
+		"addBook": &graphql.Field{
+			Type:        bookType, // the return type for this field
+			Description: "add a new book",
 			Args: graphql.FieldConfigArgument{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
-				"description": &graphql.ArgumentConfig{
-					Type: graphql.NewNonNull(graphql.String),
-				},
-				"otherNames": &graphql.ArgumentConfig{
-					Type: graphql.NewList(graphql.String),
-				},
-				"imageUrl": &graphql.ArgumentConfig{
-					Type: graphql.String,
+				"pages": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.Int),
 				},
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 
 				// marshall and cast the argument value
 				name, _ := params.Args["name"].(string)
-				description, _ := params.Args["description"].(string)
-				otherNames, _ := params.Args["otherNames"].([]string)
-				imageUrl, _ := params.Args["imageUrl"].(string)
+				pages, _ := params.Args["pages"].(int)
 
 				// figure out new id
 				newID := currentMaxId + 1
 				currentMaxId = currentMaxId + 1
 
 				// perform mutation operation here
-				// for e.g. create a Beast and save to DB.
-				newBeast := Beast{
-					ID:          newID,
-					Name:        name,
-					Description: description,
-					OtherNames:  otherNames,
-					ImageURL:    imageUrl,
+				// for e.g. create a Book and save to DB.
+				newBook := Book{
+					ID:    newID,
+					Name:  name,
+					Pages: pages,
 				}
 
-				BeastList = append(BeastList, newBeast)
+				BookList = append(BookList, newBook)
 
-				// return the new Beast object that we supposedly save to DB
+				// return the new Book object that we supposedly save to DB
 				// Note here that
-				// - we are returning a `Beast` struct instance here
-				// - we previously specified the return Type to be `beastType`
-				// - `Beast` struct maps to `beastType`, as defined in `beastType` ObjectConfig`
-				return newBeast, nil
+				// - we are returning a `Book` struct instance here
+				// - we previously specified the return Type to be `bookType`
+				// - `Book` struct maps to `bookType`, as defined in `bookType` ObjectConfig`
+				return newBook, nil
 			},
 		},
-		"updateBeast": &graphql.Field{
-			Type:        beastType, // the return type for this field
-			Description: "Update existing beast",
+		"updateBook": &graphql.Field{
+			Type:        bookType, // the return type for this field
+			Description: "Update existing book",
 			Args: graphql.FieldConfigArgument{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				"description": &graphql.ArgumentConfig{
-					Type: graphql.String,
+				"pages": &graphql.ArgumentConfig{
+					Type: graphql.Int,
 				},
 				"id": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.Int)},
-				"otherNames": &graphql.ArgumentConfig{
-					Type: graphql.NewList(graphql.String),
-				},
-				"imageUrl": &graphql.ArgumentConfig{
-					Type: graphql.String,
-				},
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				id, _ := params.Args["id"].(int)
-				affectedBeast := Beast{}
+				affectedBook := Book{}
 
-				// Search list for beast with id
-				for i := 0; i < len(BeastList); i++ {
-					if BeastList[i].ID == id {
-						if _, ok := params.Args["description"]; ok {
-							BeastList[i].Description = params.Args["description"].(string)
-						}
+				// Search list for book with id
+				for i := 0; i < len(BookList); i++ {
+					if BookList[i].ID == id {
 						if _, ok := params.Args["name"]; ok {
-							BeastList[i].Name = params.Args["name"].(string)
+							BookList[i].Name = params.Args["name"].(string)
 						}
-						if _, ok := params.Args["imageUrl"]; ok {
-							BeastList[i].ImageURL = params.Args["imageUrl"].(string)
+						if _, ok := params.Args["pages"]; ok {
+							BookList[i].Pages = params.Args["pages"].(int)
 						}
-						if _, ok := params.Args["otherNames"]; ok {
-							BeastList[i].OtherNames = params.Args["otherNames"].([]string)
-						}
-						// Assign updated beast so we can return it
-						affectedBeast = BeastList[i]
+						// Assign updated book so we can return it
+						affectedBook = BookList[i]
 						break
 					}
 				}
-				// Return affected beast
-				return affectedBeast, nil
+				// Return affected book
+				return affectedBook, nil
 			},
 		},
 	},
@@ -169,9 +139,9 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
-		"beast": &graphql.Field{
-			Type:        beastType,
-			Description: "Get single beast",
+		"book": &graphql.Field{
+			Type:        bookType,
+			Description: "Get single book",
 			Args: graphql.FieldConfigArgument{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.String,
@@ -182,29 +152,29 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 				nameQuery, isOK := params.Args["name"].(string)
 				if isOK {
 					// Search for el with name
-					for _, beast := range BeastList {
-						if beast.Name == nameQuery {
-							return beast, nil
+					for _, book := range BookList {
+						if book.Name == nameQuery {
+							return book, nil
 						}
 					}
 				}
 
-				return Beast{}, nil
+				return Book{}, nil
 			},
 		},
 
-		"beastList": &graphql.Field{
-			Type:        graphql.NewList(beastType),
-			Description: "List of beasts",
+		"bookList": &graphql.Field{
+			Type:        graphql.NewList(bookType),
+			Description: "List of books",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return BeastList, nil
+				return BookList, nil
 			},
 		},
 	},
 })
 
 // define schema, with our rootQuery and rootMutation
-var BeastSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
+var BookSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Query:    rootQuery,
 	Mutation: rootMutation,
 })
