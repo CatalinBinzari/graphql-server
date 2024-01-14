@@ -21,3 +21,10 @@ query ExampleQuery {
     pages
   }
 }
+
+query ExampleQuery {
+  bookList  (nameContains: "a") {
+    name
+    pages
+  }
+}

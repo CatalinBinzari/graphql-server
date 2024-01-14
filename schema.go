@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"github.com/graphql-go/graphql"
 )
@@ -277,6 +278,9 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
+				"nameContains": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
 			},
 			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 				filteredBookList := []Book{}
@@ -285,6 +289,17 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 					// Search for el with name
 					for _, book := range BookList {
 						if book.Name == nameQuery {
+							filteredBookList = append(filteredBookList, book)
+						}
+					}
+
+					return filteredBookList, nil
+				}
+				nameQueryConatins, isOK := params.Args["nameContains"].(string)
+				if isOK {
+					// Search for el with name
+					for _, book := range BookList {
+						if strings.Contains(book.Name, nameQueryConatins) {
 							filteredBookList = append(filteredBookList, book)
 						}
 					}
