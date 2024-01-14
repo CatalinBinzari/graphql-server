@@ -81,6 +81,25 @@ var listType = graphql.NewList(graphql.NewObject(graphql.ObjectConfig{
 	},
 }))
 
+var entityType = graphql.NewInterface(graphql.InterfaceConfig{
+	Name: "Entity",
+	Fields: graphql.Fields{
+		"name": &graphql.Field{
+			Type: graphql.String,
+		},
+	},
+	ResolveType: func(p graphql.ResolveTypeParams) *graphql.Object {
+		// if _, ok := p.Value.(*Human); ok {
+		//     return humanType
+		// }
+		// if _, ok := p.Value.(*Alien); ok {
+		//     return alienType
+		// }
+		// return nil
+		return nil
+	},
+})
+
 // json types
 
 type Author struct {
@@ -115,6 +134,9 @@ type Book struct {
 // - the field type matches the field type in our struct
 var bookType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Book",
+	Interfaces: []*graphql.Interface{
+		entityType,
+	},
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
 			Type: graphql.Int,
@@ -251,7 +273,25 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 		"bookList": &graphql.Field{
 			Type:        graphql.NewList(bookType),
 			Description: "List of books",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+				filteredBookList := []Book{}
+				nameQuery, isOK := params.Args["name"].(string)
+				if isOK {
+					// Search for el with name
+					for _, book := range BookList {
+						if book.Name == nameQuery {
+							filteredBookList = append(filteredBookList, book)
+						}
+					}
+
+					return filteredBookList, nil
+				}
+
 				return BookList, nil
 			},
 		},

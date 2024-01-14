@@ -1,0 +1,23 @@
+query ExampleQuery {
+  bookList {
+    id
+    name
+    pages
+    genre
+    author {
+      name
+      id
+    }
+    reviews {
+      rating
+    }
+  }
+}
+
+
+query ExampleQuery {
+  bookList  (name: "Memory Man") {
+    name
+    pages
+  }
+}
